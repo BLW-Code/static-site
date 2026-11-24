@@ -22,3 +22,6 @@ class TestHTMLNode(unittest.TestCase):
         props = {}
         node = HTMLNode('a', 'read more', None, props)
         self.assertEqual(node.props_to_html(), answer)
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,6 +1,6 @@
 class HTMLNode:
     def __init__(self, tag:str | None = None, value: str | None = None, children: list["HTMLNode"] | None = None, props: dict[str, str] | None = None ) -> None:
-        self.tag = tag
+        self.tag = tag.strip() if isinstance(tag, str) else None
         self.value = value
         self.children = children
         self.props = props
@@ -21,14 +21,44 @@ class HTMLNode:
         return prop_html
 
 class LeafNode(HTMLNode):
-    def __init__(self, tag: str | None, value: str | None, props: dict[str, str] | None = None) -> None:
+    def __init__(self, tag: str | None, value: str, props: dict[str, str] | None = None) -> None:
         super().__init__(tag, value, None, props)
 
+    def __repr__(self):
+        return f"LeafNode({self.tag}, {self.value}, {self.props})"
+
     def to_html(self) -> str:
-        if not self.value:
-            raise ValueError("leaf node does not have a value")
-        if self.tag is None or len(self.tag) == 0:
+        if self.value is None:
+            raise ValueError(f"LeafNode does not have a value: {self}")
+        if self.tag is None or len(self.tag.strip()) == 0:
             return self.value
         if self.props_to_html() is not None:
             return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
         return f"<{self.tag}>{self.value}</{self.tag}>"
+
+
+class ParentNode(HTMLNode):
+    def __init__(self, tag: str, children: list[HTMLNode], props: dict[str, str] = None) -> None:
+        super().__init__(tag, None, children, props)
+
+    def __repr__(self):
+        return f"ParentNode({self.tag}, {self.children}, {self.props})"
+
+    def to_html(self) -> str:
+        if self.tag is None or len(self.tag.strip()) == 0:
+            raise ValueError(f"ParentNode must have a tag value: {self}")
+
+        if self.children is None or len(self.children) == 0:
+            raise ValueError(f"ParentNode must have children: {self}")
+
+        if self.props_to_html():
+            start_tag = f"<{self.tag}{self.props_to_html()}>"
+        else:
+            start_tag = f"<{self.tag}>"
+        end_tag = f"</{self.tag}>"
+
+        inner_content = ""
+        for child in self.children:
+            inner_content += child.to_html()
+
+        return start_tag + inner_content + end_tag
