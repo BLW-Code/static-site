@@ -18,7 +18,14 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
 
             if delimiter in markdown_wrapper_delimiters and delimiter not in after_delimiter:
                 raise ValueError(f"Invalid Markdown: {node_text}")
-            
+
+            if delimiter in markdown_wrapper_delimiters and delimiter in after_delimiter:
+                pass
+            elif delimiter in after_delimiter:
+                pass
+            else:
+                pass
+
 
             
 
